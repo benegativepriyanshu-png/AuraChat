@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>AuraChat – Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+:root {
+  --neon-cyan: #00e0ff;
+  --neon-magenta: #ff00ff;
+  --glass-bg: rgba(5, 15, 30, 0.75);
+  --border-neon: rgba(0, 224, 255, 0.5);
+}
+
+body {
+  background: url("https://i.pinimg.com/originals/26/8a/ec/268aec0afc88997c2352fc90d92c1e99.gif")
+    center/cover fixed;
+  font-family: "Inter", sans-serif;
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.06) 3px
+  );
+  opacity: 0.14;
+}
+
+.glass-box {
+  position: relative;
+  max-width: 550px;
+  margin: 80px auto;
+  border-radius: 22px;
+  padding: 30px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-neon);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 35px rgba(0, 224, 255, 0.35);
+  overflow: hidden;
+}
+
+.glass-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("https://i.pinimg.com/originals/26/8a/ec/268aec0afc88997c2352fc90d92c1e99.gif")
+    center/cover;
+  opacity: 0.18;
+  filter: brightness(1.2);
+  z-index: 0;
+}
+
+.glass-content {
+  position: relative;
+  z-index: 2;
+}
+
+.glitch-header {
+  font-size: 36px;
+  font-weight: 900;
+  text-align: center;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-magenta);
+  animation: flicker 2.2s infinite;
+}
+
+@keyframes flicker {
+  0%, 97% { opacity: 1 }
+  98% { opacity: 0.6 }
+  99% { opacity: 0.35 }
+  100% { opacity: 1 }
+}
+
+.typewriter {
+  font-family: "Courier New", monospace;
+  white-space: pre-line;
+  font-size: 18px;
+  border-right: 2px solid var(--neon-cyan);
+  width: 0;
+  overflow: hidden;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+  animation: typing 4s steps(60, end) forwards, blink 0.8s infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink {
+  50% { border-color: transparent }
+}
+
+input, select {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border-neon);
+  padding: 12px;
+  width: 100%;
+  border-radius: 12px;
+  color: white;
+  transition: 0.25s;
+}
+
+input:focus, select:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px var(--neon-cyan);
+  outline: none;
+}
+
+#avatarPreview {
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+  border: 2px solid var(--neon-cyan);
+  display: none;
+  margin-top: 10px;
+  object-fit: cover;
+  box-shadow: 0 0 12px var(--neon-cyan);
+}
+
+#saveScan {
+  display: none;
+  text-align: center;
+  margin-top: 15px;
+  font-family: monospace;
+  color: var(--neon-magenta);
+  text-shadow: 0 0 10px var(--neon-magenta);
+  animation: scanMove 1s infinite linear;
+}
+
+@keyframes scanMove {
+  0% { opacity: 0.4 }
+  50% { opacity: 1 }
+  100% { opacity: 0.4 }
+}
+
+#bootScreen {
+  position: fixed;
+  inset: 0;
+  background: #030a1c;
+  color: var(--neon-cyan);
+  font-family: "Courier New", monospace;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  z-index: 9999;
+  animation: fadeOut 1.3s forwards 2.5s;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* Neon Scrollbar */
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 224, 255, 0.1);
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 12px var(--neon-cyan);
+  border-radius: 10px;
+}
+
+/* Hover highlight */
+#language option:hover {
+  background: rgba(0, 224, 255, 0.35);
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div id="bootScreen">AURA BOOTING…</div>
+
+<div class="glass-box">
+  <div class="glass-content">
+    <h1 class="glitch-header mb-4">AURA CHAT</h1>
+
+    <div class="typewriter mb-6">
+Initializing profile module...
+Loading UI components...
+Ready.
+    </div>
+
+    <label class="text-cyan-300">Username</label>
+    <input id="username"/>
+
+    <label class="text-cyan-300 mt-4 block">Preferred Language</label>
+
+    <!-- SEARCH BAR -->
+    <input 
+      id="languageSearch"
+      placeholder="Search language..."
+      class="mb-3 p-2 w-full rounded-lg bg-black/30 border border-cyan-400 text-white
+             focus:border-cyan-300 focus:shadow-[0_0_10px_var(--neon-cyan)]"
+    />
+
+    <!-- ANIMATED SCROLL DROPDOWN -->
+    <div 
+      id="languageWrapper"
+      class="max-h-0 overflow-hidden rounded-xl border border-cyan-400 bg-black/20 p-2 
+             shadow-inner transition-all duration-500"
+      style="backdrop-filter: blur(6px);"
+    >
+      <select id="language" size="10" class="w-full bg-transparent border-none text-white custom-scroll">
+        <option value="en">🇺🇸 English</option>
+        <option value="hi">🇮🇳 Hindi</option>
+        <option value="es">🇪🇸 Spanish</option>
+        <option value="fr">🇫🇷 French</option>
+        <option value="de">🇩🇪 German</option>
+        <option value="it">🇮🇹 Italian</option>
+        <option value="pt">🇵🇹 Portuguese</option>
+        <option value="ru">🇷🇺 Russian</option>
+        <option value="ja">🇯🇵 Japanese</option>
+        <option value="ko">🇰🇷 Korean</option>
+        <option value="zh">🇨🇳 Chinese (Simplified)</option>
+        <option value="zt">🇹🇼 Chinese (Traditional)</option>
+        <option value="ar">🇸🇦 Arabic</option>
+        <option value="bn">🇧🇩 Bengali</option>
+        <option value="ur">🇵🇰 Urdu</option>
+        <option value="pa">🇮🇳 Punjabi</option>
+        <option value="ta">🇮🇳 Tamil</option>
+        <option value="te">🇮🇳 Telugu</option>
+        <option value="mr">🇮🇳 Marathi</option>
+        <option value="gu">🇮🇳 Gujarati</option>
+        <option value="ml">🇮🇳 Malayalam</option>
+        <option value="kn">🇮🇳 Kannada</option>
+        <option value="ne">🇳🇵 Nepali</option>
+        <option value="si">🇱🇰 Sinhala</option>
+        <option value="th">🇹🇭 Thai</option>
+        <option value="vi">🇻🇳 Vietnamese</option>
+        <option value="id">🇮🇩 Indonesian</option>
+        <option value="ms">🇲🇾 Malay</option>
+        <option value="tl">🇵🇭 Filipino</option>
+        <option value="tr">🇹🇷 Turkish</option>
+        <option value="fa">🇮🇷 Persian</option>
+        <option value="uk">🇺🇦 Ukrainian</option>
+        <option value="pl">🇵🇱 Polish</option>
+        <option value="nl">🇳🇱 Dutch</option>
+        <option value="sv">🇸🇪 Swedish</option>
+        <option value="no">🇳🇴 Norwegian</option>
+        <option value="da">🇩🇰 Danish</option>
+        <option value="fi">🇫🇮 Finnish</option>
+        <option value="cs">🇨🇿 Czech</option>
+        <option value="sk">🇸🇰 Slovak</option>
+        <option value="hu">🇭🇺 Hungarian</option>
+        <option value="he">🇮🇱 Hebrew</option>
+        <option value="ro">🇷🇴 Romanian</option>
+        <option value="el">🇬🇷 Greek</option>
+        <option value="sr">🇷🇸 Serbian</option>
+        <option value="hr">🇭🇷 Croatian</option>
+        <option value="bg">🇧🇬 Bulgarian</option>
+        <option value="et">🇪🇪 Estonian</option>
+        <option value="lv">🇱🇻 Latvian</option>
+        <option value="lt">🇱🇹 Lithuanian</option>
+      </select>
+    </div>
+
+    <script>
+    // Smooth open/close of dropdown
+    const wrapper = document.getElementById("languageWrapper");
+    const search = document.getElementById("languageSearch");
+
+    search.addEventListener("focus", () => {
+      wrapper.classList.remove("max-h-0");
+      wrapper.classList.add("max-h-60");
+    });
+
+    search.addEventListener("blur", () => {
+      setTimeout(() => {
+        wrapper.classList.add("max-h-0");
+        wrapper.classList.remove("max-h-60");
+      }, 300);
+    });
+
+    // Search filter
+    const langSelect = document.getElementById("language");
+
+    search.addEventListener("input", () => {
+      const filter = search.value.toLowerCase();
+      for (const option of langSelect.options) {
+        option.style.display = option.textContent.toLowerCase().includes(filter)
+          ? "block"
+          : "none";
+      }
+    });
+
+    // Auto-detect user language
+    const userLang = navigator.language.slice(0, 2);
+    for (const option of langSelect.options) {
+      if (option.value === userLang) {
+        option.selected = true;
+        break;
+      }
+    }
+
+    // Typewriter reveal animation
+    for (const option of langSelect.options) {
+      option.style.opacity = 0;
+    }
+
+    let delay = 0;
+    for (const option of langSelect.options) {
+      setTimeout(() => {
+        option.style.transition = "opacity 0.3s";
+        option.style.opacity = 1;
+      }, delay);
+      delay += 30;
+    }
+    </script>
+
+    <label class="text-cyan-300 mt-4 block">Upload Avatar</label>
+    <input id="avatarFile" type="file" accept="image/*"/>
+    <img id="avatarPreview"/>
+
+    <button id="saveBtn"
+      class="w-full mt-6 py-3 rounded-xl bg-cyan-500/30 border border-cyan-400
+             hover:bg-cyan-500/50 transition shadow-lg">
+      Save Profile
+    </button>
+
+    <div id="saveScan">SCANNING...</div>
+
+    <button onclick="window.location.href='community.html'"
+      class="w-full mt-4 py-3 rounded-xl bg-magenta-500/20 border border-magenta-400
+             hover:bg-magenta-500/40 transition shadow-lg">
+      Back to Community
+    </button>
+
+  </div>
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/profile.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Chat — AuraChat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind for clean UI utilities -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Miku Neon Theme */
+    :root {
+      --neon-cyan: #00e0ff;
+      --neon-magenta: #ff00ff;
+      --dark-bg: #030a1c;
+      --glass-bg: rgba(5, 15, 30, 0.7);
+      --glass-border: rgba(0, 224, 255, 0.3);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: url("https://i.pinimg.com/originals/26/8a/ec/268aec0afc88997c2352fc90d92c1e99.gif") center/cover no-repeat fixed;
+      color: white;
+      min-height: 100vh;
+      backdrop-filter: blur(2px);
+    }
+
+    /* Glass Chat Container */
+    .chat-wrapper {
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 224, 255, 0.25);
+      width: 90%;
+      max-width: 1100px;
+      margin: 40px auto;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: rgba(3, 10, 28, 0.85);
+      border-right: 1px solid var(--glass-border);
+      padding: 20px;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    /* Chat messages area */
+    #messages {
+      overflow-y: auto;
+      flex-grow: 1;
+      height: 440px;
+      padding-right: 10px;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      width: fit-content;
+      max-width: 70%;
+      backdrop-filter: blur(6px);
+    }
+
+    .message.me {
+      margin-left: auto;
+      background: rgba(0, 224, 255, 0.15);
+      border-color: var(--neon-cyan);
+    }
+
+    /* Input Row */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      padding-top: 10px;
+    }
+
+    .input {
+      flex-grow: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
+      color: white;
+    }
+
+    .button {
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      background: rgba(0, 224, 255, 0.15);
+      transition: 0.2s;
+    }
+
+    .button:hover {
+      background: rgba(0, 224, 255, 0.25);
+      box-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    /* GIF Modal */
+    #gifModal {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.85);
+      padding: 14px;
+      height: 45%;
+      border-radius: 12px 12px 0 0;
+      display: none;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+      z-index: 999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- MAIN CHAT WRAPPER -->
+  <div class="chat-wrapper">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="logo">AURA<span style="opacity:0.7">CHAT</span></div>
+      <div id="roomTitle" class="mt-2 text-sm opacity-80"></div>
+
+      <div class="mt-4 text-sm opacity-80">
+        <strong class="text-cyan-300">Users in room:</strong>
+        <div id="usersListInner" class="mt-2"></div>
+      </div>
+    </div>
+
+    <!-- CHAT BOX -->
+    <div class="flex flex-col flex-grow p-6">
+
+      <!-- USER INFO -->
+      <div class="flex items-center gap-3 mb-4">
+        <img id="myAvatar" class="w-12 h-12 rounded-full border border-cyan-400 hidden" />
+        <div>
+          <div id="myName" class="text-lg font-semibold"></div>
+          <div id="myLang" class="text-xs opacity-80"></div>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div id="messages" class="flex-grow pr-2"></div>
+
+      <!-- INPUT ROW -->
+      <div class="input-row">
+
+        <!-- GIF BUTTON -->
+        <button id="gifBtn" class="button">GIF</button>
+
+        <!-- TEXT INPUT -->
+        <input id="messageInput" class="input" placeholder="Type a message..." />
+
+        <!-- SEND BUTTON -->
+        <button id="sendBtn" class="button">Send</button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- GIF PICKER MODAL -->
+  <div id="gifModal">
+    <input id="gifSearch" class="input mb-3" placeholder="Search GIFs..." />
+
+    <div id="gifResults"
+      style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+    </div>
+  </div>
+
+
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <!-- Your JS -->
+  <script src="/js/utils.js" defer></script>
+  <script src="/js/socket.js" defer></script>
+  <script src="/js/chat.js" defer></script>
+
+</body>
+</html>
