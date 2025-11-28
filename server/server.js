@@ -1,114 +1,92 @@
-// =====================================================
-// 🌐 AuraChat — Server Entry File
-// =====================================================
-
-// Load environment variables
 require('dotenv').config();
-
-// Core dependencies
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const path = require('path');
+const path = require('path'); // <-- needed
 
-// Database + Socket logic
 const connectDB = require('./src/config/db');
 const chatSocket = require('./src/socket/chatSocket');
 
-// Models
 const User = require('./src/models/User');
 const Room = require('./src/models/Room');
 
-// Initialize app
 const app = express();
+app.use(cors());
+app.use(express.json({ limit: '2mb' })); // avatar base64 may be sent
+
 const PORT = process.env.PORT || 4000;
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: "2mb" }));   // Handle base64 avatars
-
-// Connect to MongoDB
+// Connect DB
 connectDB(process.env.MONGODB_URI);
 
-// =====================================================
-// 📁 Serve Frontend Client
-// =====================================================
+// -------------------------------------------------
+// ✅ SERVE CLIENT FRONTEND (IMPORTANT)
+// -------------------------------------------------
 app.use(express.static(path.join(__dirname, "../Client")));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../Client/index.html"));
 });
 
-// =====================================================
-// 📌 API ROUTES
-// =====================================================
+// -------------------------------------------------
+// API ROUTES
+// -------------------------------------------------
 
-// ------------------------
-// 👤 Create User
-// ------------------------
-app.post("/api/users", async (req, res) => {
+// Create user
+app.post('/api/users', async (req, res) => {
   try {
     const { username, avatarUrl, language } = req.body;
 
-    if (!username || !language) {
-      return res.status(400).json({ error: "Username and language required" });
-    }
+    if (!username || !language)
+      return res.status(400).json({ error: 'username and language required' });
 
     const user = await User.create({ username, avatarUrl, language });
     res.json(user);
-  } catch (err) {
-    console.error("❌ Create User Error:", err);
-    res.status(500).json({ error: "Server error" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'server error' });
   }
 });
 
-// ------------------------
-// 🏠 Fetch Rooms
-// ------------------------
-app.get("/api/rooms", async (req, res) => {
+// Get rooms
+app.get('/api/rooms', async (req, res) => {
   try {
     const rooms = await Room.find().lean();
     res.json(rooms);
-  } catch (err) {
-    console.error("❌ Fetch Rooms Error:", err);
-    res.status(500).json({ error: "Server error" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'server error' });
   }
 });
 
-// ------------------------
-// 🆕 Create Room
-// ------------------------
-app.post("/api/rooms", async (req, res) => {
+// Create room
+app.post('/api/rooms', async (req, res) => {
   try {
     const { name } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: "Room name required" });
-    }
+    if (!name)
+      return res.status(400).json({ error: 'name required' });
 
     const room = await Room.create({ name });
     res.json(room);
-  } catch (err) {
-    console.error("❌ Create Room Error:", err);
-    res.status(500).json({ error: "Server error" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'server error' });
   }
 });
 
-// =====================================================
-// 🔌 SOCKET.IO SETUP
-// =====================================================
+// -------------------------------------------------
+// SOCKET.IO SERVER
+// -------------------------------------------------
 const server = http.createServer(app);
-const { Server } = require("socket.io");
+const { Server } = require('socket.io');
 
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: { origin: '*' }
 });
 
 chatSocket(io);
 
-// =====================================================
-// 🚀 Start Server
-// =====================================================
-server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+server.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
